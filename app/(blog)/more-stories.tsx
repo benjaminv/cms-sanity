@@ -36,7 +36,12 @@ export default async function MoreStories(params: {
                   {excerpt}
                 </p>
               )}
-              {author && <Avatar name={author.name} picture={author.picture} />}
+              {author && (
+                <Avatar
+                  name={`${author.firstName} ${author.lastName}`}
+                  picture={author.picture}
+                />
+              )}
             </article>
           );
         })}

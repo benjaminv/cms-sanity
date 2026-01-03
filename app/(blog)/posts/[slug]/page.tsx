@@ -45,7 +45,10 @@ export async function generateMetadata(
   const ogImage = resolveOpenGraphImage(post?.coverImage);
 
   return {
-    authors: post?.author?.name ? [{ name: post?.author?.name }] : [],
+    authors:
+      post?.author?.firstName && post?.author?.lastName
+        ? [{ name: `${post.author.firstName} ${post.author.lastName}` }]
+        : [],
     title: post?.title,
     description: post?.excerpt,
     openGraph: {
@@ -77,7 +80,10 @@ export default async function PostPage({ params }: Props) {
         </h1>
         <div className="hidden md:mb-12 md:block">
           {post.author && (
-            <Avatar name={post.author.name} picture={post.author.picture} />
+            <Avatar
+              name={`${post.author.firstName} ${post.author.lastName}`}
+              picture={post.author.picture}
+            />
           )}
         </div>
         <div className="mb-8 sm:mx-0 md:mb-16">
@@ -86,7 +92,10 @@ export default async function PostPage({ params }: Props) {
         <div className="mx-auto max-w-2xl">
           <div className="mb-6 block md:hidden">
             {post.author && (
-              <Avatar name={post.author.name} picture={post.author.picture} />
+              <Avatar
+                name={`${post.author.firstName} ${post.author.lastName}`}
+                picture={post.author.picture}
+              />
             )}
           </div>
           <div className="mb-6 text-lg">

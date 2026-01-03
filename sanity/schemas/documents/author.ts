@@ -8,8 +8,14 @@ export default defineType({
   type: "document",
   fields: [
     defineField({
-      name: "name",
-      title: "Name",
+      name: "firstName",
+      title: "First Name",
+      type: "string",
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: "lastName",
+      title: "Last Name",
       type: "string",
       validation: (rule) => rule.required(),
     }),
@@ -42,4 +48,19 @@ export default defineType({
       validation: (rule) => rule.required(),
     }),
   ],
+  preview: {
+    select: {
+      firstName: "firstName",
+      lastName: "lastName",
+      picture: "picture",
+    },
+    prepare(selection) {
+      const { firstName, lastName, picture } = selection;
+      return {
+        title: [firstName, lastName].filter(Boolean).join(" ") || "Untitled",
+        subtitle: "Author",
+        media: picture,
+      };
+    },
+  },
 });

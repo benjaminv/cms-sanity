@@ -11,6 +11,7 @@ import { Inter } from "next/font/google";
 import { draftMode } from "next/headers";
 
 import AlertBanner from "./alert-banner";
+import Footer from "./footer";
 import PortableText from "./portable-text";
 
 import * as demo from "@/sanity/lib/demo";
@@ -100,6 +101,7 @@ export default async function RootLayout({
               )}
             </div>
           </footer>
+          <Footer />
         </section>
         {isDraftMode && <VisualEditing />}
         <SpeedInsights />
