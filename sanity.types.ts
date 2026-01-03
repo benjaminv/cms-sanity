@@ -13,6 +13,74 @@
  */
 
 // Source: schema.json
+export type InfoSection = {
+  _type: "infoSection";
+  heading?: string;
+  subheading?: string;
+  content?: Array<{
+    children?: Array<{
+      marks?: Array<string>;
+      text?: string;
+      _type: "span";
+      _key: string;
+    }>;
+    style?: "normal" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "blockquote";
+    listItem?: "bullet" | "number";
+    markDefs?: Array<{
+      href?: string;
+      _type: "link";
+      _key: string;
+    }>;
+    level?: number;
+    _type: "block";
+    _key: string;
+  }>;
+};
+
+export type CallToAction = {
+  _type: "callToAction";
+  heading?: string;
+  text?: string;
+  buttonText?: string;
+  link?: Link;
+};
+
+export type Link = {
+  _type: "link";
+  linkType?: "href" | "page" | "post";
+  href?: string;
+  page?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "page";
+  };
+  post?: {
+    _ref: string;
+    _type: "reference";
+    _weak?: boolean;
+    [internalGroqTypeReferenceTo]?: "post";
+  };
+  openInNewTab?: boolean;
+};
+
+export type Page = {
+  _id: string;
+  _type: "page";
+  _createdAt: string;
+  _updatedAt: string;
+  _rev: string;
+  name?: string;
+  slug?: Slug;
+  heading?: string;
+  subheading?: string;
+  pageBuilder?: Array<{
+    _key: string;
+  } & CallToAction | {
+    _key: string;
+  } & InfoSection>;
+};
+
 export type Post = {
   _id: string;
   _type: "post";
@@ -58,13 +126,13 @@ export type Post = {
     _ref: string;
     _type: "reference";
     _weak?: boolean;
-    [internalGroqTypeReferenceTo]?: "author";
+    [internalGroqTypeReferenceTo]?: "person";
   };
 };
 
-export type Author = {
+export type Person = {
   _id: string;
-  _type: "author";
+  _type: "person";
   _createdAt: string;
   _updatedAt: string;
   _rev: string;
@@ -383,7 +451,7 @@ export type SanityAssetSourceData = {
   url?: string;
 };
 
-export type AllSanitySchemaTypes = Post | Author | Settings | SanityAssistInstructionTask | SanityAssistTaskStatus | SanityAssistSchemaTypeAnnotations | SanityAssistOutputType | SanityAssistOutputField | SanityAssistInstructionContext | AssistInstructionContext | SanityAssistInstructionUserInput | SanityAssistInstructionPrompt | SanityAssistInstructionFieldRef | SanityAssistInstruction | SanityAssistSchemaTypeField | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
+export type AllSanitySchemaTypes = InfoSection | CallToAction | Link | Page | Post | Person | Settings | SanityAssistInstructionTask | SanityAssistTaskStatus | SanityAssistSchemaTypeAnnotations | SanityAssistOutputType | SanityAssistOutputField | SanityAssistInstructionContext | AssistInstructionContext | SanityAssistInstructionUserInput | SanityAssistInstructionPrompt | SanityAssistInstructionFieldRef | SanityAssistInstruction | SanityAssistSchemaTypeField | SanityImagePaletteSwatch | SanityImagePalette | SanityImageDimensions | SanityImageHotspot | SanityImageCrop | SanityFileAsset | SanityImageAsset | SanityImageMetadata | Geopoint | Slug | SanityAssetSourceData;
 export declare const internalGroqTypeReferenceTo: unique symbol;
 // Source: ./app/(blog)/posts/[slug]/page.tsx
 // Variable: postSlugs
@@ -609,6 +677,62 @@ export type PostQueryResult = {
     } | null;
   } | null;
 } | null;
+// Variable: pageQuery
+// Query: *[_type == "page" && slug.current == $slug] [0] {    _id,    _type,    name,    "slug": slug.current,    heading,    subheading,    pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        link {            linkType,  href,  openInNewTab,  page->{  _type == "page" => {"slug": slug.current, _type},  _type == "post" => {"slug": slug.current, _type},},  post->{  _type == "page" => {"slug": slug.current, _type},  _type == "post" => {"slug": slug.current, _type},},        }      },      _type == "infoSection" => {        ...,        content[]{          ...,          markDefs[]{            ...,              _type == "page" => {"slug": slug.current, _type},  _type == "post" => {"slug": slug.current, _type},          }        }      },    },  }
+export type PageQueryResult = {
+  _id: string;
+  _type: "page";
+  name: string | null;
+  slug: string | null;
+  heading: string | null;
+  subheading: string | null;
+  pageBuilder: Array<{
+    _key: string;
+    _type: "callToAction";
+    heading?: string;
+    text?: string;
+    buttonText?: string;
+    link: {
+      linkType: "href" | "page" | "post" | null;
+      href: string | null;
+      openInNewTab: boolean | null;
+      page: {
+        slug: string | null;
+        _type: "page";
+      } | null;
+      post: {
+        slug: string | null;
+        _type: "post";
+      } | null;
+    } | null;
+  } | {
+    _key: string;
+    _type: "infoSection";
+    heading?: string;
+    subheading?: string;
+    content: Array<{
+      children?: Array<{
+        marks?: Array<string>;
+        text?: string;
+        _type: "span";
+        _key: string;
+      }>;
+      style?: "blockquote" | "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "normal";
+      listItem?: "bullet" | "number";
+      markDefs: Array<{
+        href?: string;
+        _type: "link";
+        _key: string;
+      }> | null;
+      level?: number;
+      _type: "block";
+      _key: string;
+    }> | null;
+  }> | null;
+} | null;
+// Variable: pageSlugsQuery
+// Query: *[_type == "page" && defined(slug.current)][].slug.current
+export type PageSlugsQueryResult = Array<string | null>;
 
 // Query TypeMap
 import "@sanity/client";
@@ -619,5 +743,7 @@ declare module "@sanity/client" {
     "\n  *[_type == \"post\" && defined(slug.current)] | order(date desc, _updatedAt desc) [0] {\n    content,\n    \n  _id,\n  \"status\": select(_originalId in path(\"drafts.**\") => \"draft\", \"published\"),\n  \"title\": coalesce(title, \"Untitled\"),\n  \"slug\": slug.current,\n  excerpt,\n  coverImage,\n  \"date\": coalesce(date, _updatedAt),\n  \"author\": author->{firstName, lastName, picture},\n\n  }\n": HeroQueryResult;
     "\n  *[_type == \"post\" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {\n    \n  _id,\n  \"status\": select(_originalId in path(\"drafts.**\") => \"draft\", \"published\"),\n  \"title\": coalesce(title, \"Untitled\"),\n  \"slug\": slug.current,\n  excerpt,\n  coverImage,\n  \"date\": coalesce(date, _updatedAt),\n  \"author\": author->{firstName, lastName, picture},\n\n  }\n": MoreStoriesQueryResult;
     "\n  *[_type == \"post\" && slug.current == $slug] [0] {\n    content,\n    \n  _id,\n  \"status\": select(_originalId in path(\"drafts.**\") => \"draft\", \"published\"),\n  \"title\": coalesce(title, \"Untitled\"),\n  \"slug\": slug.current,\n  excerpt,\n  coverImage,\n  \"date\": coalesce(date, _updatedAt),\n  \"author\": author->{firstName, lastName, picture},\n\n  }\n": PostQueryResult;
+    "\n  *[_type == \"page\" && slug.current == $slug] [0] {\n    _id,\n    _type,\n    name,\n    \"slug\": slug.current,\n    heading,\n    subheading,\n    pageBuilder[]{\n      ...,\n      _type == \"callToAction\" => {\n        ...,\n        link {\n          \n  linkType,\n  href,\n  openInNewTab,\n  page->{\n  _type == \"page\" => {\"slug\": slug.current, _type},\n  _type == \"post\" => {\"slug\": slug.current, _type},\n},\n  post->{\n  _type == \"page\" => {\"slug\": slug.current, _type},\n  _type == \"post\" => {\"slug\": slug.current, _type},\n},\n\n        }\n      },\n      _type == \"infoSection\" => {\n        ...,\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == \"page\" => {\"slug\": slug.current, _type},\n  _type == \"post\" => {\"slug\": slug.current, _type},\n\n          }\n        }\n      },\n    },\n  }\n": PageQueryResult;
+    "\n  *[_type == \"page\" && defined(slug.current)][].slug.current\n": PageSlugsQueryResult;
   }
 }

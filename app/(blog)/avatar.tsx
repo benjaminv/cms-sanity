@@ -1,11 +1,11 @@
 import { Image } from "next-sanity/image";
 
-import type { Author } from "@/sanity.types";
+import type { Person } from "@/sanity.types";
 import { urlForImage } from "@/sanity/lib/utils";
 
 interface Props {
   name: string;
-  picture: Exclude<Author["picture"], undefined> | null;
+  picture: Exclude<Person["picture"], undefined> | null;
 }
 
 export default function Avatar({ name, picture }: Props) {

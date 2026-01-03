@@ -16,9 +16,13 @@ import { structureTool } from "sanity/structure";
 import { apiVersion, dataset, projectId, studioUrl } from "@/sanity/lib/api";
 import { pageStructure, singletonPlugin } from "@/sanity/plugins/settings";
 import { assistWithPresets } from "@/sanity/plugins/assist";
-import author from "@/sanity/schemas/documents/author";
+import person from "@/sanity/schemas/documents/person";
 import post from "@/sanity/schemas/documents/post";
+import page from "@/sanity/schemas/documents/page";
 import settings from "@/sanity/schemas/singletons/settings";
+import link from "@/sanity/schemas/objects/link";
+import callToAction from "@/sanity/schemas/objects/callToAction";
+import infoSection from "@/sanity/schemas/objects/infoSection";
 import { resolveHref } from "@/sanity/lib/utils";
 
 const homeLocation = {
@@ -35,8 +39,13 @@ export default defineConfig({
       // Singletons
       settings,
       // Documents
+      person,
       post,
-      author,
+      page,
+      // Objects
+      link,
+      callToAction,
+      infoSection,
     ],
   },
   plugins: [
@@ -46,6 +55,10 @@ export default defineConfig({
           {
             route: "/posts/:slug",
             filter: `_type == "post" && slug.current == $slug`,
+          },
+          {
+            route: "/:slug",
+            filter: `_type == "page" && slug.current == $slug`,
           },
         ]),
         locations: {
@@ -69,6 +82,21 @@ export default defineConfig({
               ],
             }),
           }),
+          page: defineLocations({
+            select: {
+              name: "name",
+              slug: "slug.current",
+            },
+            resolve: (doc) => ({
+              locations: [
+                {
+                  title: doc?.name || "Untitled",
+                  href: resolveHref("page", doc?.slug)!,
+                },
+                homeLocation,
+              ],
+            }),
+          }),
         },
       },
       previewUrl: { previewMode: { enable: "/api/draft-mode/enable" } },
@@ -84,6 +112,6 @@ export default defineConfig({
     // Vision lets you query your content with GROQ in the studio
     // https://www.sanity.io/docs/the-vision-plugin
     process.env.NODE_ENV === "development" &&
-      visionTool({ defaultApiVersion: apiVersion }),
+    visionTool({ defaultApiVersion: apiVersion }),
   ].filter(Boolean) as PluginOptions[],
 });
