@@ -6,8 +6,8 @@ import { urlForImage } from "@/sanity/lib/utils";
 interface LinkData {
   linkType?: string;
   href?: string;
-  page?: { slug?: string };
-  post?: { slug?: string };
+  page?: string;  // slug string from GROQ dereference
+  post?: string;  // slug string from GROQ dereference
   openInNewTab?: boolean;
 }
 
@@ -57,17 +57,17 @@ function ResolvedLink({
     );
   }
 
-  if (link.linkType === "page" && link.page?.slug) {
+  if (link.linkType === "page" && link.page) {
     return (
-      <Link href={`/${link.page.slug}`} target={target} className={className}>
+      <Link href={`/${link.page}`} target={target} className={className}>
         {children}
       </Link>
     );
   }
 
-  if (link.linkType === "post" && link.post?.slug) {
+  if (link.linkType === "post" && link.post) {
     return (
-      <Link href={`/posts/${link.post.slug}`} target={target} className={className}>
+      <Link href={`/posts/${link.post}`} target={target} className={className}>
         {children}
       </Link>
     );

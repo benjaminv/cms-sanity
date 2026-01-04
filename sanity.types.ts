@@ -734,7 +734,7 @@ export type PostQueryResult = {
   } | null;
 } | null;
 // Variable: pageQuery
-// Query: *[_type == "page" && slug.current == $slug] [0] {    _id,    _type,    name,    "slug": slug.current,    heading,    subheading,    pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        link {            linkType,  href,  openInNewTab,  page->{  _type == "page" => {"slug": slug.current, _type},  _type == "post" => {"slug": slug.current, _type},},  post->{  _type == "page" => {"slug": slug.current, _type},  _type == "post" => {"slug": slug.current, _type},},        }      },      _type == "infoSection" => {        ...,        content[]{          ...,          markDefs[]{            ...,              _type == "page" => {"slug": slug.current, _type},  _type == "post" => {"slug": slug.current, _type},          }        }      },    },  }
+// Query: *[_type == "page" && slug.current == $slug] [0] {    _id,    _type,    name,    "slug": slug.current,    heading,    subheading,    pageBuilder[]{      ...,      _type == "callToAction" => {        ...,        button {          ...,            link {    ...,      _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }  }        }      },      _type == "infoSection" => {        ...,        content[]{          ...,          markDefs[]{            ...,              _type == "link" => {    "page": page->slug.current,    "post": post->slug.current  }          }        }      },    },  }
 export type PageQueryResult = {
   _id: string;
   _type: "page";
@@ -765,7 +765,18 @@ export type PageQueryResult = {
       _type: "block";
       _key: string;
     }>;
-    button?: Button;
+    button: {
+      _type: "button";
+      buttonText?: string;
+      link: {
+        _type: "link";
+        linkType?: "href" | "page" | "post";
+        href?: string;
+        page: string | null;
+        post: string | null;
+        openInNewTab?: boolean;
+      } | null;
+    } | null;
     image?: {
       asset?: {
         _ref: string;
@@ -780,7 +791,6 @@ export type PageQueryResult = {
     };
     theme?: "dark" | "light";
     contentAlignment?: "imageFirst" | "textFirst";
-    link: null;
   } | {
     _key: string;
     _type: "infoSection";
@@ -799,6 +809,8 @@ export type PageQueryResult = {
         href?: string;
         _type: "link";
         _key: string;
+        page: null;
+        post: null;
       }> | null;
       level?: number;
       _type: "block";
@@ -819,7 +831,7 @@ declare module "@sanity/client" {
     "\n  *[_type == \"post\" && defined(slug.current)] | order(date desc, _updatedAt desc) [0] {\n    content,\n    \n  _id,\n  \"status\": select(_originalId in path(\"drafts.**\") => \"draft\", \"published\"),\n  \"title\": coalesce(title, \"Untitled\"),\n  \"slug\": slug.current,\n  excerpt,\n  coverImage,\n  \"date\": coalesce(date, _updatedAt),\n  \"author\": author->{firstName, lastName, picture},\n\n  }\n": HeroQueryResult;
     "\n  *[_type == \"post\" && _id != $skip && defined(slug.current)] | order(date desc, _updatedAt desc) [0...$limit] {\n    \n  _id,\n  \"status\": select(_originalId in path(\"drafts.**\") => \"draft\", \"published\"),\n  \"title\": coalesce(title, \"Untitled\"),\n  \"slug\": slug.current,\n  excerpt,\n  coverImage,\n  \"date\": coalesce(date, _updatedAt),\n  \"author\": author->{firstName, lastName, picture},\n\n  }\n": MoreStoriesQueryResult;
     "\n  *[_type == \"post\" && slug.current == $slug] [0] {\n    content,\n    \n  _id,\n  \"status\": select(_originalId in path(\"drafts.**\") => \"draft\", \"published\"),\n  \"title\": coalesce(title, \"Untitled\"),\n  \"slug\": slug.current,\n  excerpt,\n  coverImage,\n  \"date\": coalesce(date, _updatedAt),\n  \"author\": author->{firstName, lastName, picture},\n\n  }\n": PostQueryResult;
-    "\n  *[_type == \"page\" && slug.current == $slug] [0] {\n    _id,\n    _type,\n    name,\n    \"slug\": slug.current,\n    heading,\n    subheading,\n    pageBuilder[]{\n      ...,\n      _type == \"callToAction\" => {\n        ...,\n        link {\n          \n  linkType,\n  href,\n  openInNewTab,\n  page->{\n  _type == \"page\" => {\"slug\": slug.current, _type},\n  _type == \"post\" => {\"slug\": slug.current, _type},\n},\n  post->{\n  _type == \"page\" => {\"slug\": slug.current, _type},\n  _type == \"post\" => {\"slug\": slug.current, _type},\n},\n\n        }\n      },\n      _type == \"infoSection\" => {\n        ...,\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == \"page\" => {\"slug\": slug.current, _type},\n  _type == \"post\" => {\"slug\": slug.current, _type},\n\n          }\n        }\n      },\n    },\n  }\n": PageQueryResult;
+    "\n  *[_type == \"page\" && slug.current == $slug] [0] {\n    _id,\n    _type,\n    name,\n    \"slug\": slug.current,\n    heading,\n    subheading,\n    pageBuilder[]{\n      ...,\n      _type == \"callToAction\" => {\n        ...,\n        button {\n          ...,\n          \n  link {\n    ...,\n    \n  _type == \"link\" => {\n    \"page\": page->slug.current,\n    \"post\": post->slug.current\n  }\n\n  }\n\n        }\n      },\n      _type == \"infoSection\" => {\n        ...,\n        content[]{\n          ...,\n          markDefs[]{\n            ...,\n            \n  _type == \"link\" => {\n    \"page\": page->slug.current,\n    \"post\": post->slug.current\n  }\n\n          }\n        }\n      },\n    },\n  }\n": PageQueryResult;
     "\n  *[_type == \"page\" && defined(slug.current)][].slug.current\n": PageSlugsQueryResult;
   }
 }

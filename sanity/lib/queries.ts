@@ -35,16 +35,17 @@ export const postQuery = defineQuery(`
 
 // Link reference expansion for pageBuilder
 const linkReference = /* groq */ `
-  _type == "page" => {"slug": slug.current, _type},
-  _type == "post" => {"slug": slug.current, _type},
+  _type == "link" => {
+    "page": page->slug.current,
+    "post": post->slug.current
+  }
 `;
 
 const linkFields = /* groq */ `
-  linkType,
-  href,
-  openInNewTab,
-  page->{${linkReference}},
-  post->{${linkReference}},
+  link {
+    ...,
+    ${linkReference}
+  }
 `;
 
 export const pageQuery = defineQuery(`
@@ -59,7 +60,8 @@ export const pageQuery = defineQuery(`
       ...,
       _type == "callToAction" => {
         ...,
-        link {
+        button {
+          ...,
           ${linkFields}
         }
       },
