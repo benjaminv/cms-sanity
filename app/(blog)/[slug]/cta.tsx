@@ -1,91 +1,147 @@
 import Link from "next/link";
+import { Image } from "next-sanity/image";
+import { PortableText } from "@portabletext/react";
+import { urlForImage } from "@/sanity/lib/utils";
 
 interface LinkData {
-    linkType?: string;
-    href?: string;
-    page?: { slug?: string };
-    post?: { slug?: string };
-    openInNewTab?: boolean;
+  linkType?: string;
+  href?: string;
+  page?: { slug?: string };
+  post?: { slug?: string };
+  openInNewTab?: boolean;
+}
+
+interface ButtonData {
+  buttonText?: string;
+  link?: LinkData;
 }
 
 interface CtaBlock {
-    heading?: string;
-    text?: string;
-    buttonText?: string;
-    link?: LinkData;
+  _key?: string;
+  heading?: string;
+  eyebrow?: string;
+  body?: any[];
+  button?: ButtonData;
+  image?: {
+    asset?: { _ref: string };
+    crop?: any;
+    alt?: string;
+  };
+  theme?: "light" | "dark";
+  contentAlignment?: "textFirst" | "imageFirst";
 }
 
 interface CtaProps {
-    block: CtaBlock;
+  block: CtaBlock;
 }
 
 function ResolvedLink({
-    link,
-    children,
-    className,
+  link,
+  children,
+  className,
 }: {
-    link?: LinkData;
-    children: React.ReactNode;
-    className?: string;
+  link?: LinkData;
+  children: React.ReactNode;
+  className?: string;
 }) {
-    if (!link) return null;
+  if (!link) return null;
 
-    const target = link.openInNewTab ? "_blank" : undefined;
-    const rel = link.openInNewTab ? "noopener noreferrer" : undefined;
+  const target = link.openInNewTab ? "_blank" : undefined;
+  const rel = link.openInNewTab ? "noopener noreferrer" : undefined;
 
-    if (link.linkType === "href" && link.href) {
-        return (
-            <a href={link.href} target={target} rel={rel} className={className}>
-                {children}
-            </a>
-        );
-    }
+  if (link.linkType === "href" && link.href) {
+    return (
+      <a href={link.href} target={target} rel={rel} className={className}>
+        {children}
+      </a>
+    );
+  }
 
-    if (link.linkType === "page" && link.page?.slug) {
-        return (
-            <Link href={`/${link.page.slug}`} target={target} className={className}>
-                {children}
-            </Link>
-        );
-    }
+  if (link.linkType === "page" && link.page?.slug) {
+    return (
+      <Link href={`/${link.page.slug}`} target={target} className={className}>
+        {children}
+      </Link>
+    );
+  }
 
-    if (link.linkType === "post" && link.post?.slug) {
-        return (
-            <Link href={`/posts/${link.post.slug}`} target={target} className={className}>
-                {children}
-            </Link>
-        );
-    }
+  if (link.linkType === "post" && link.post?.slug) {
+    return (
+      <Link href={`/posts/${link.post.slug}`} target={target} className={className}>
+        {children}
+      </Link>
+    );
+  }
 
-    return null;
+  return null;
 }
 
 export default function Cta({ block }: CtaProps) {
-    return (
-        <div className="my-12">
-            <div className="bg-gray-50 border border-gray-100 rounded-2xl max-w-3xl">
-                <div className="px-12 py-12 flex flex-col gap-6">
-                    <div className="max-w-xl flex flex-col gap-3">
-                        <h2 className="text-3xl font-bold tracking-tight text-black sm:text-4xl">
-                            {block.heading}
-                        </h2>
-                        {block.text && (
-                            <p className="text-lg leading-8 text-gray-600">{block.text}</p>
-                        )}
-                    </div>
+  const { heading, eyebrow, body = [], button, image, theme, contentAlignment } = block;
 
-                    {block.buttonText && block.link && (
-                        <div className="flex items-center gap-x-6 lg:mt-0 lg:flex-shrink-0">
-                            <ResolvedLink
-                                link={block.link}
-                                className="rounded-full flex gap-2 mr-6 items-center bg-black hover:bg-gray-800 py-3 px-6 text-white transition-colors duration-200"
-                            >
-                                {block.buttonText}
-                            </ResolvedLink>
-                        </div>
-                    )}
-                </div>
+  const isDark = theme === "dark";
+  const isImageFirst = contentAlignment === "imageFirst";
+
+  const imageUrl = image?.asset?._ref
+    ? urlForImage(image)?.width(704).height(400).url()
+    : null;
+
+  return (
+    <section className={`relative my-12 ${isDark ? "bg-gray-900" : "bg-gray-50"}`}>
+      <div className="container mx-auto px-5">
+        <div className="grid lg:grid-cols-2 gap-12 py-12">
+          <div
+            className={`${isImageFirst && image ? "row-start-2 lg:row-start-1 lg:col-start-2" : ""} flex flex-col gap-2`}
+          >
+            {eyebrow && (
+              <span
+                className={`text-sm uppercase font-mono tracking-tight opacity-70 ${isDark ? "text-white" : "text-gray-600"}`}
+              >
+                {eyebrow}
+              </span>
+            )}
+            {heading && (
+              <h2
+                className={`text-2xl md:text-3xl lg:text-4xl font-bold ${isDark ? "text-white" : "text-black"}`}
+              >
+                {heading}
+              </h2>
+            )}
+            {body && body.length > 0 && (
+              <div className={`prose ${isDark ? "prose-invert" : ""}`}>
+                <PortableText value={body} />
+              </div>
+            )}
+
+            {button?.buttonText && button?.link && (
+              <div className="flex mt-4">
+                <ResolvedLink
+                  link={button.link}
+                  className={`rounded-full flex gap-2 font-mono text-sm whitespace-nowrap items-center py-3 px-6 transition-colors duration-200 ${
+                    isDark
+                      ? "bg-white text-black hover:bg-gray-200"
+                      : "bg-black text-white hover:bg-gray-800"
+                  }`}
+                >
+                  {button.buttonText}
+                </ResolvedLink>
+              </div>
+            )}
+          </div>
+
+          {imageUrl && (
+            <div className="flex items-center">
+              <Image
+                src={imageUrl}
+                alt={image?.alt || "CTA image"}
+                width={704}
+                height={400}
+                className="rounded-sm object-cover"
+              />
             </div>
+          )}
         </div>
-    );
+      </div>
+    </section>
+  );
 }

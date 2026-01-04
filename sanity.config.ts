@@ -21,6 +21,8 @@ import post from "@/sanity/schemas/documents/post";
 import page from "@/sanity/schemas/documents/page";
 import settings from "@/sanity/schemas/singletons/settings";
 import link from "@/sanity/schemas/objects/link";
+import button from "@/sanity/schemas/objects/button";
+import blockContentTextOnly from "@/sanity/schemas/objects/blockContentTextOnly";
 import callToAction from "@/sanity/schemas/objects/callToAction";
 import infoSection from "@/sanity/schemas/objects/infoSection";
 import { resolveHref } from "@/sanity/lib/utils";
@@ -44,6 +46,8 @@ export default defineConfig({
       page,
       // Objects
       link,
+      button,
+      blockContentTextOnly,
       callToAction,
       infoSection,
     ],
